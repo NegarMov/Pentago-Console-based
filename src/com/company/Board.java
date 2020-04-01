@@ -6,7 +6,6 @@ import java.util.Scanner;
  * The Board class simulates a board for Pentago game. It holds a list of the board
  * cells which itself holds a stone for player 1, player 2 or is empty.
  * The first player plays white and the second player plays black.
- * Also this class is a child class of JFrame.
  * @author Negar Movaghatian
  * @since 2020-03-30
  */
@@ -14,8 +13,11 @@ public class Board{
 
     // The list of the board's cells
     protected Cell[][] cells;
+    // The name of the player at the moment
     private String player;
+    // The number of stones on the board
     private int moves;
+    // Shows if a block is empty or not
     private boolean[] isEmpty;
 
     /**
@@ -32,6 +34,9 @@ public class Board{
                 cells[i][j] = new Cell();
     }
 
+    /**
+     * Print all the components of the board.
+     */
     public void printBoard() {
         System.out.println("\n\n\n\n");
         for (int i=0; i<6; i++) {
@@ -53,7 +58,7 @@ public class Board{
     }
 
     /**
-     * Swap the given section 90 degrees clockwise or anticlockwise.
+     * rotate the given section 90 degrees clockwise or anticlockwise.
      * @param section The section of the board to rotate.
      * @param direction The direction of the rotation. [CW: clockwise, ACW: anticlockwise]
      */
@@ -100,7 +105,7 @@ public class Board{
      */
     private boolean[] checkBoard() {
         boolean[] ans = {false, false}; // [0: first player, 1: second player]
-        int[][] diagonalWays = {{1, 8, 15, 12, 29}, {6, 13, 20, 27, 34}, {0, 7, 14, 21, 28}, {7, 14, 21, 28, 35}
+        int[][] diagonalWays = {{1, 8, 15, 22, 29}, {6, 13, 20, 27, 34}, {0, 7, 14, 21, 28}, {7, 14, 21, 28, 35}
                 , {11, 16, 21, 26, 31}, {4, 9, 14, 19, 24}, {5, 10, 15, 20, 25}, {10, 15, 20, 25, 30}};
         int[][] verticalWays = {{-1, 5, 11, 17, 23}, {5, 11, 17, 23, 29}};
         int[][] horizontalWays = {{-6, -5, -4, -3, -2}, {-5, -4, -3, -2, -1}};
@@ -182,7 +187,7 @@ public class Board{
 
     /**
      * Run a multi-player Pentago game until one or both of the players get
-     * five stones in a row (vertically, horizontally or diagonal).
+     * five stones in a row (vertically, horizontally or diagonal) or the board is full.
      * White begins the game.
      */
     public void runGame() {

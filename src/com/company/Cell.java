@@ -1,15 +1,14 @@
 package com.company;
 
 /**
- * The class Cell represents a cell of the board. Each cell is made of a button, the cell's
- * coordinate ((x, y)), the status of the cell (is empty, a black stone is on it or a white stone is on it)
- * and manages which player's turn it is at the moment.
+ * The class Cell represents a cell of the board. Each cell is made of a Unicode character, the status
+ * of the cell (is empty, a black stone is on it or a white stone is on it) and manages which player's
+ * turn it is at the moment.
  * @author Negar Movaghatian
  * @since 2020-03-30
  */
 public class Cell{
-    // The button which shows the cell and has features, like its
-    // icon changes when clicked on
+    // The Unicode character which represents the cell
     private char character;
     // The turn of the players [0: first player(white)  1: second player(black)]
     static int turn;
@@ -17,8 +16,7 @@ public class Cell{
     private int stat;
 
     /**
-     * Create a new cell with the given coordinate and add a button with an empty icon
-     * to it.
+     * Create a new cell with the default character.
      */
     public Cell() {
         turn = 0;
@@ -42,7 +40,7 @@ public class Cell{
     }
 
     /**
-     * Swap the cell with another cell by swapping their icon and status.
+     * Swap the cell with another cell by swapping their Unicode character and status.
      * @param other
      */
     public void swap(Cell other) {
@@ -77,8 +75,8 @@ public class Cell{
     }
 
     /**
-     * The class ButtonHandler manages the ActionEvent created by
-     * the cell's button.
+     * Add a new stone to the board. Also checks if the chosen cell
+     * is empty or not.
      */
     public int addStone() {
         if (stat==0) {
