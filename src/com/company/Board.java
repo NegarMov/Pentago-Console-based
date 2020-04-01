@@ -16,6 +16,7 @@ public class Board{
     protected Cell[][] cells;
     private String player;
     private int moves;
+    private boolean[] isEmpty;
 
     /**
      * Creat a new board with adding 36 cells to it.
@@ -25,6 +26,7 @@ public class Board{
         cells = new Cell[6][6];
         moves = 0;
         player = "[Player 1]";
+        isEmpty = new boolean[]{true, true, true, true};
         for (int i=0; i<6; i++)
             for (int j=0; j<6; j++)
                 cells[i][j] = new Cell();
@@ -38,15 +40,13 @@ public class Board{
                     System.out.print(" \u2503 ");
                 if (cells[i][j].getCharacter()=='\u2B1B')
                     System.out.print("\u001B[31m");
-                System.out.print(cells[i][j].getCharacter() + "\u001B[0m");
+                System.out.print(cells[i][j].getCharacter() + "\u2005\u001B[0m");
             }
             System.out.println();
             if (i == 2) {
-                for (int k = 0; k < 13; k++)
-                    if (k==6)
-                        System.out.print('\u254B');
-                    else
-                        System.out.print("\u2501");
+                System.out.print("\u2005");
+                for (int k = 0; k < 15; k++)
+                        System.out.print((k==7)? '\u254B' : "\u2501");
                 System.out.println();
             }
         }
@@ -130,34 +130,83 @@ public class Board{
     }
 
     /**
+     * Add a stone to the board according to the answers the player gives.
+     */
+    private void addCell() {
+        Scanner scn = new Scanner(System.in);
+        System.out.println("Which block of the board you want to put your stone on?");
+        int s = scn.nextInt();
+        while (s<=0 || s>4) {
+            System.out.println("Please enter a number between 1 and 4.");
+            s = scn.nextInt();
+        }
+        System.out.println("In which place?");
+        int p = scn.nextInt();
+        while (p<=0 || p>9) {
+            System.out.println("Please enter a number between 1 and 9.");
+            p = scn.nextInt();
+        }
+        int x = (0<p && p<4)? ((s==1 || s==2)? 0 : 3) : (3<p && p<7)? ((s==1 || s==2)? 1 : 4) : ((s==1 || s==2)? 2 : 5);
+        int y = (p==1 || p==4 || p==7)? ((s==1 || s==3)? 0 : 3) : (p==2 || p==5 || p==8)? ((s==1 || s==3)? 1 : 4) : ((s==1 || s==3)? 2 : 5);
+        if (cells[x][y].addStone()==-1)
+            addCell();
+        else
+            isEmpty[s - 1] = false;
+    }
+
+    /**
+     * Rotate a block according to the answers the player gives.
+     */
+    public void rotateBlock() {
+        Scanner scn = new Scanner(System.in);
+        boolean pass = isEmpty[0] || isEmpty[1] || isEmpty[2] || isEmpty[3];
+        System.out.println("Which section of the board you want to rotate?");
+        if (pass)
+            System.out.println("(Press 5 to pass)");
+        int section = scn.nextInt();
+        while ((!pass && (section<=0 || section>4)) || (pass && (section<=0 || section>5))) {
+            System.out.println("Please enter a number between 1 and " + ((!pass)? "4." : "5."));
+            section = scn.nextInt();
+        }
+        if (section!=5) {
+            System.out.println("In which direction you want to rotate the block?");
+            System.out.println("1)Clockwise\n2)Anticlockwise");
+            int direction = scn.nextInt();
+            while (direction<=0 || direction>2) {
+                System.out.println("Please enter a number between 1 and 2.");
+                direction = scn.nextInt();
+            }
+            rotate(section - 1, (direction == 1) ? "CW" : "ACW");
+        }
+    }
+
+    /**
      * Run a multi-player Pentago game until one or both of the players get
      * five stones in a row (vertically, horizontally or diagonal).
      * White begins the game.
      */
     public void runGame() {
+        boolean[] flag = {false, false};
         while (!checkBoard()[0] && !checkBoard()[1] && moves<36) {
             printBoard();
             player = (Cell.getTurn()==0)? "[Player 1]" : "[Player 2]";
             System.out.println(player);
 
-            Scanner scn = new Scanner(System.in);
-            System.out.println("Which block of the board you want to put your stone on?");
-            int s = scn.nextInt();
-            System.out.println("In which place?");
-            int p = scn.nextInt();
-            int x = (0<p && p<4)? ((s==1 || s==2)? 0 : 3) : (3<p && p<7)? ((s==1 || s==2)? 1 : 4) : ((s==1 || s==2)? 2 : 5);
-            int y = (p==1 || p==4 || p==7)? ((s==1 || s==3)? 0 : 3) : (p==2 || p==5 || p==8)? ((s==1 || s==3)? 1 : 4) : ((s==1 || s==3)? 2 : 5);
-            cells[x][y].addStone();
+            addCell();
 
-            System.out.println("Which section of the board you want to rotate?");
-            int section = scn.nextInt();
-            System.out.println("In which direction you want to rotate the block?");
-            System.out.println("1)Clockwise\n2)Anticlockwise"); //pass
-            int direction = scn.nextInt();
-            rotate(section-1, (direction == 1) ? "CW" : "ACW");
+            if (checkBoard()[0])
+                flag[0] = true;
+            else if (checkBoard()[1])
+                flag[1] = true;
+
+            rotateBlock();
+
             moves++;
         }
-        System.out.println((checkBoard()[0] && checkBoard()[1])? "<<Draw!>>" :
-                (checkBoard()[0])? "<<White Wins!>>" : (checkBoard()[1])? "<<Black Wins!>>" : "<<Draw!>>");
+        printBoard();
+        System.out.println( (flag[0])? "<<White Wins!>>" : (flag[1])? "<<Black Wins!>>" :
+                        (checkBoard()[0] && checkBoard()[1])? "<<Draw!>>" :
+                        (checkBoard()[0])? "<<White Wins!>>" :
+                        (checkBoard()[1])? "<<Black Wins!>>" : "<<Draw!>>");
     }
 }

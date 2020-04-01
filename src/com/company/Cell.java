@@ -80,13 +80,16 @@ public class Cell{
      * The class ButtonHandler manages the ActionEvent created by
      * the cell's button.
      */
-    public void addStone() {
+    public int addStone() {
         if (stat==0) {
             updateCell((turn==0)? "W" : "B");
             stat = (turn==0)? 1 : -1;
             turn = 1 - turn;
+            return 0;
         }
-        else
-            System.out.println("Please choose another cell.");
+        else {
+            System.out.println("Please choose an empty cell.");
+            return -1;
+        }
     }
 }
